@@ -19,7 +19,11 @@ function Menu() {
             Search
           </p>
         </div>
-        <a href="">
+        <a
+          href="https://github.com/BlasMartoss/SpotifyCopy"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <div className="flex flex-row gap-5 items-center  cursor-pointer ">
             <FaGithub size={25} className="text-[#b3b3b3]" />
             <p className="text-[#b3b3b3] text-[18px] font-bold hover:text-white">
