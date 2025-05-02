@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import PlaylistData from "../data/PlaylistData";
-import { FaPause, FaPlay } from "react-icons/fa";
 
 function Hero({ onSelectPlaylist }) {
   const hour = new Date().getHours();
@@ -9,13 +8,7 @@ function Hero({ onSelectPlaylist }) {
   if (hour >= 5 && hour < 12) greeting = "¡Buenos Días!";
   else if (hour >= 12 && hour < 19) greeting = "¡Buenas Tardes!";
 
-  const [playingIndex, setPlayingIndex] = useState(null);
   const [hoverColor, setHoverColor] = useState(null);
-
-  const togglePlay = (index) => {
-    if (playingIndex === index) setPlayingIndex(null);
-    else setPlayingIndex(index);
-  };
 
   return (
     <section
@@ -51,13 +44,7 @@ function Hero({ onSelectPlaylist }) {
                 togglePlay(index);
               }}
               className="invisible group-hover:visible cursor-pointer mx-5"
-            >
-              {playingIndex === index ? (
-                <FaPause className="text-xl text-white" />
-              ) : (
-                <FaPlay className="text-xl text-white" />
-              )}
-            </div>
+            ></div>
           </div>
         ))}
       </div>

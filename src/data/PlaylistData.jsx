@@ -8,6 +8,7 @@ const PlaylistData = [
     artists: "The Weeknd, Dua Lipa, Post Malone",
     time: "1 hora 12 minutos",
     color: "#bf4848",
+    numeroCanciones: "7",
   },
   {
     id: 2,
@@ -18,6 +19,7 @@ const PlaylistData = [
     artists: "Daddy Yankee, J Balvin, Karol G",
     time: "1 hora 5 minutos",
     color: "#fcc076",
+    numeroCanciones: "7",
   },
   {
     id: 3,
@@ -28,6 +30,7 @@ const PlaylistData = [
     artists: "Ed Sheeran, John Mayer, Sam Smith",
     time: "55 minutos",
     color: "#3c2f27",
+    numeroCanciones: "6",
   },
   {
     id: 4,
@@ -38,6 +41,7 @@ const PlaylistData = [
     artists: "Foo Fighters, Queen, Nirvana",
     time: "1 hora 30 minutos",
     color: "#4c00bd",
+    numeroCanciones: "7",
   },
   {
     id: 5,
@@ -48,6 +52,7 @@ const PlaylistData = [
     artists: "Jack Johnson, Norah Jones, Jason Mraz",
     time: "1 hora 5 minutos",
     color: "#fd8a29",
+    numeroCanciones: "7",
   },
   {
     id: 6,
@@ -58,6 +63,7 @@ const PlaylistData = [
     artists: "Imagine Dragons, OneRepublic, The Lumineers",
     time: "1 hora 20 minutos",
     color: "#4a4d4f",
+    numeroCanciones: "7",
   },
 ];
 

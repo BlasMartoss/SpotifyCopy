@@ -1,13 +1,12 @@
 import React from "react";
 import "./styles/style.css";
-
+import { PlayerProvider } from "../src/context/PlayerContext";
 import Home from "./pages/Home";
 function App() {
   return (
-    <div className="">
+    <PlayerProvider>
       <Home />
-    </div>
+    </PlayerProvider>
   );
 }
-
 export default App;

@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-
+import React, { useContext, useState, useEffect, useRef } from "react";
 import {
   FaRandom,
   FaStepBackward,
@@ -8,12 +7,70 @@ import {
   FaPlay,
 } from "react-icons/fa";
 import { RiVolumeUpFill, RiVolumeMuteFill, RiRepeatFill } from "react-icons/ri";
+import { PlayerContext } from "../context/PlayerContext";
 
 function Player() {
+  const { currentSong, isPlaying, playNext, playPrev, setIsPlaying } =
+    useContext(PlayerContext);
+
   const [muted, setMuted] = useState(false);
   const [isRepeatActive, setIsRepeatActive] = useState(false);
   const [isShuffleActive, setIsShuffleActive] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [progress, setProgress] = useState(0);
+
+  const audioRef = useRef(null);
+
+  // Convert secs to min
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  };
+
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.play().catch(() => {});
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [isPlaying, currentSong]);
+
+  // Sync volume and mute
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = muted ? 0 : volume;
+    }
+  }, [muted, volume]);
+
+  // Update progress as song plays
+  const handleTimeUpdate = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      const percentage = (audio.currentTime / audio.duration) * 100;
+      setProgress(percentage || 0);
+    }
+  };
+
+  const handleProgressChange = (e) => {
+    const audio = audioRef.current;
+    const value = parseFloat(e.target.value);
+    if (audio && audio.duration) {
+      audio.currentTime = (value / 100) * audio.duration;
+      setProgress(value);
+    }
+  };
+
+  const handleEnded = () => {
+    if (isRepeatActive) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    } else {
+      playNext();
+    }
+  };
 
   const toggleMute = () => setMuted(!muted);
   const toggleRepeat = () => setIsRepeatActive(!isRepeatActive);
@@ -22,32 +79,47 @@ function Player() {
 
   return (
     <section className="bg-[#000000] fixed bottom-0 left-0 w-full h-[90px] text-white flex flex-col py-2">
+      <audio
+        ref={audioRef}
+        src={currentSong?.audio || ""}
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={handleEnded}
+        autoPlay={isPlaying}
+      />
+
       <div className="flex items-center justify-between h-full px-4">
-        {/* Left: Song info */}
+        {/* Song Info */}
         <div className="flex flex-row min-w-[200px] flex-1 items-center">
-          <div className="h-[50px] w-[50px] rounded-[5px] bg-amber-50">
-            <img src="" alt="" className="h-15 rounded-[5px]" />
+          <div className="h-[50px] w-[50px] rounded-[5px] overflow-hidden">
+            <img
+              src={currentSong?.image || ""}
+              alt={currentSong?.title || ""}
+              className="h-full w-full object-cover"
+            />
           </div>
           <div className="flex flex-col text-white ml-[20px] gap-1">
-            <p className="w-[150px] text-[12px] md:text-[15px] font-semibold">
-              Mockingbird
+            <p className="text-[14px] font-semibold truncate">
+              {currentSong?.title || ""}
             </p>
-            <p className="w-[100px] text-[12px] md:text-[15px] text-[#8a8a8a] hover:underline hover:text-white cursor-pointer">
-              Eminem
+            <p className="text-[12px] text-[#8a8a8a]">
+              {currentSong?.author || ""}
             </p>
           </div>
         </div>
 
-        {/* Center: Playback controls */}
+        {/* Controls */}
         <div className="flex-col items-center justify-center flex-1 hidden md:flex">
-          <div className="flex items-center justify-center gap-5">
+          <div className="flex items-center justify-center gap-5 mb-1">
             <FaRandom
               onClick={toggleShuffle}
               className={`cursor-pointer text-[20px] ${
                 isShuffleActive ? "text-[#1fdf64]" : "text-white"
-              } hover:text-[#1fdf64]`}
+              }`}
             />
-            <FaStepBackward className="text-white hover:text-gray-300 cursor-pointer" />
+            <FaStepBackward
+              onClick={playPrev}
+              className="text-white hover:text-gray-300 cursor-pointer"
+            />
             <button
               onClick={togglePlay}
               className="bg-white text-black p-2 rounded-full hover:scale-105 transition"
@@ -58,76 +130,62 @@ function Player() {
                 <FaPlay className="text-xl" />
               )}
             </button>
-            <FaStepForward className="text-white hover:text-gray-300 cursor-pointer" />
+            <FaStepForward
+              onClick={playNext}
+              className="text-white hover:text-gray-300 cursor-pointer"
+            />
             <RiRepeatFill
               onClick={toggleRepeat}
               className={`cursor-pointer text-[20px] ${
                 isRepeatActive ? "text-[#1fdf64]" : "text-white"
-              } hover:text-[#1fdf64]`}
+              }`}
             />
           </div>
-          <div className="flex items-center gap-2 w-full">
-            <p>0:00</p>
+
+          {/* Progress bar with time */}
+          <div className="flex items-center justify-center gap-2 mt-2">
+            {/* Current time */}
+            <span className="text-[12px] mt-1">
+              {formatTime(audioRef.current?.currentTime || 0)}
+            </span>
             <input
-              className="w-full hidden md:flex h-1 rounded range-slider accent-white"
               type="range"
+              min="0"
+              max="100"
+              value={progress}
+              onChange={handleProgressChange}
+              className="w-[400px] mt-2 accent-white"
             />
-            <p>3:24</p>
+            {/* Total duration */}
+            <span className="text-[12px] mt-1">
+              {formatTime(currentSong?.duration || 0)}
+            </span>
           </div>
         </div>
 
-        {/* Right: Volume and play button */}
+        {/* Volume */}
         <div className="flex items-center justify-end gap-3 flex-1">
-          <RiRepeatFill
-            onClick={toggleRepeat}
-            className={`cursor-pointer text-[20px] md:hidden ${
-              isRepeatActive ? "text-[#1fdf64]" : "text-white"
-            } hover:text-[#1fdf64]`}
-          />
-
-          <FaRandom
-            onClick={toggleShuffle}
-            className={`cursor-pointer text-[20px] md:hidden ${
-              isShuffleActive ? "text-[#1fdf64]" : "text-white"
-            } hover:text-[#1fdf64]`}
-          />
-
           {muted ? (
             <RiVolumeMuteFill
               onClick={toggleMute}
-              className="text-white hover:text-gray-300 cursor-pointer text-[20px]"
+              className="cursor-pointer text-white"
             />
           ) : (
             <RiVolumeUpFill
               onClick={toggleMute}
-              className="text-white hover:text-gray-300 cursor-pointer text-[20px]"
+              className="cursor-pointer text-white"
             />
           )}
-
-          <button
-            onClick={togglePlay}
-            className="bg-white text-black p-2 rounded-full md:hidden hover:scale-105 transition"
-          >
-            {isPlaying ? (
-              <FaPause className="text-[10px]" />
-            ) : (
-              <FaPlay className="text-[10px]" />
-            )}
-          </button>
-
           <input
             type="range"
-            className="hidden md:flex h-1 w-[150px] rounded range-slider accent-white"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={(e) => setVolume(parseFloat(e.target.value))}
+            className="w-[100px]  accent-white"
           />
         </div>
-      </div>
-
-      {/* Bottom (solo móvil): progreso */}
-      <div className="w-full px-4 md:hidden">
-        <input
-          type="range"
-          className="w-full h-1 rounded range-slider accent-white"
-        />
       </div>
     </section>
   );

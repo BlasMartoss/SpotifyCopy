@@ -5,7 +5,7 @@ import PlaylistData from "../data/PlaylistData";
 function Library({ onSelectPlaylist }) {
   return (
     <section
-      className="bg-[#121212] w-[320px] h-[750px] fixed left-0 m-2 rounded-[10px]"
+      className="bg-[#121212] w-[320px] h-[750px] mt-[55px] fixed left-0 m-2 rounded-[10px]"
       style={{ top: "110px" }}
     >
       <div className="gap-5 flex pt-5 cursor-pointer items-center mb-5 px-[20px]">

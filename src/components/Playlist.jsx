@@ -1,32 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { IoChevronBack, IoClose } from "react-icons/io5";
 import { FaPause, FaPlay } from "react-icons/fa";
 import { FiClock } from "react-icons/fi";
 import SongData from "../data/Songs";
-import ArtistData from "../data/Artists"; // Importa los datos de artistas
+import ArtistData from "../data/Artists";
 import Artist from "./Artist";
+import { PlayerContext } from "../context/PlayerContext";
 
 function Playlist({ playlist, onClose }) {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [selectedArtist, setSelectedArtist] = useState(null);
-  const [selectedSong, setSelectedSong] = useState(null); // Añadido para la canción
-  const [isLgUp, setIsLgUp] = useState(false); // Estado para saber si es lg+
+  const [selectedSong, setSelectedSong] = useState(null);
+  const [isLgUp, setIsLgUp] = useState(false);
+
+  const songs = SongData.filter((song) => song.playlistId === playlist.id);
+  const { playSong, currentSong, isPlaying, setIsPlaying } =
+    useContext(PlayerContext);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1024px)"); // Para pantallas >= 1024px
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
     const handleChange = () => setIsLgUp(mediaQuery.matches);
-    handleChange(); // Inicializa el valor al cargar
-
+    handleChange();
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
-  const togglePlay = () => setIsPlaying(!isPlaying);
-  const songs = SongData.filter((song) => song.playlistId === playlist.id);
+  const togglePlay = () => {
+    if (currentSong && songs.some((song) => song.id === currentSong.id)) {
+      setIsPlaying(!isPlaying);
+    } else if (songs.length > 0) {
+      playSong(songs[0], songs);
+    }
+  };
 
-  const containerWidth = "100%";
-
-  // Función para obtener los datos del artista
   const getArtistData = (artistName) => {
     return ArtistData.find((artist) => artist.name === artistName);
   };
@@ -36,10 +41,9 @@ function Playlist({ playlist, onClose }) {
       className="absolute top-0 left-0 z-50 mt-2 rounded-[5px] flex overflow-hidden transition-all duration-300"
       style={{
         height: "calc(100vh - 80px)",
-        width: containerWidth,
+        width: "100%",
       }}
     >
-      {/* Fondo difuminado */}
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -51,7 +55,6 @@ function Playlist({ playlist, onClose }) {
         }}
       ></div>
 
-      {/* Contenido principal */}
       <div className="relative z-10 p-6 w-full overflow-y-auto">
         <button
           onClick={onClose}
@@ -77,7 +80,8 @@ function Playlist({ playlist, onClose }) {
             </h1>
             <p className="text-[15px] text-white">{playlist.artists}</p>
             <p className="text-[15px] font-semibold text-white">
-              {playlist.likes} - 5 songs, about {playlist.time}
+              {playlist.likes} - {playlist.numeroCanciones} songs, un total de{" "}
+              {playlist.time}
             </p>
           </div>
         </div>
@@ -87,7 +91,9 @@ function Playlist({ playlist, onClose }) {
             onClick={togglePlay}
             className="bg-white text-black p-2 rounded-full hover:scale-105 transition"
           >
-            {isPlaying ? (
+            {isPlaying &&
+            currentSong &&
+            songs.some((song) => song.id === currentSong.id) ? (
               <FaPause className="text-xl" />
             ) : (
               <FaPlay className="text-xl" />
@@ -111,24 +117,23 @@ function Playlist({ playlist, onClose }) {
             {songs.map((song, index) => (
               <li
                 key={song.id}
-                className="grid grid-cols-12 py-2 mb-2 hover:bg-gray items-center"
+                className="grid grid-cols-12 py-2 mb-2 hover:bg-gray items-center cursor-pointer "
+                onClick={() => {
+                  if (isLgUp) {
+                    setSelectedArtist(getArtistData(song.author));
+                    setSelectedSong(song);
+                  }
+                  playSong(song, songs);
+                }}
               >
                 <div className="col-span-1 text-white">{index + 1}</div>
                 <div className="col-span-6 flex items-center">
-                  <div className="w-12 h-12 rounded bg-gray-300 mr-2">
+                  <div className="w-12 h-12 bg-gray-300 mr-2">
                     <img src={song.image} alt="" />
                   </div>
 
                   <div>
-                    <p
-                      className="text-sm font-semibold text-white cursor-pointer"
-                      onClick={() => {
-                        if (isLgUp) {
-                          setSelectedArtist(getArtistData(song.author));
-                          setSelectedSong(song); // Establecer la canción seleccionada
-                        }
-                      }}
-                    >
+                    <p className="text-sm font-semibold text-white cursor-pointer">
                       {song.title}
                     </p>
                     <p className="text-xs text-gray-300">{song.author}</p>
@@ -147,13 +152,12 @@ function Playlist({ playlist, onClose }) {
         </div>
       </div>
 
-      {/* Panel del artista solo visible en lg+ */}
       {isLgUp && selectedArtist && selectedSong && (
         <div className="w-[420px] bg-[#121212] text-white relative z-50 overflow-y-auto">
           <button
             onClick={() => {
               setSelectedArtist(null);
-              setSelectedSong(null); // Limpiar la canción seleccionada
+              setSelectedSong(null);
             }}
             className="absolute top-2 right-2 text-white text-xl"
           >
