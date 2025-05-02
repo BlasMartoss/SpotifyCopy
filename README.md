@@ -1,4 +1,4 @@
-# 🎧 Spotify Copy
+# 🎧 Spotify Copy (¡Pendiente de mejoras!)
 
 Este proyecto es una copia inspirada en Spotify, donde puedes reproducir canciones de las *playlists* creadas.
 
