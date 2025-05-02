@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SongImage from "../assets/images/song-example.webp";
+
 import {
   FaRandom,
   FaStepBackward,
@@ -25,9 +25,13 @@ function Player() {
       <div className="flex items-center justify-between h-full px-4">
         {/* Left: Song info */}
         <div className="flex flex-row min-w-[200px] flex-1 items-center">
-          <img src={SongImage} alt="" className="h-15 rounded-[5px]" />
+          <div className="h-[50px] w-[50px] rounded-[5px] bg-amber-50">
+            <img src="" alt="" className="h-15 rounded-[5px]" />
+          </div>
           <div className="flex flex-col text-white ml-[20px] gap-1">
-            <p className="w-[150px] text-[12px] md:text-[15px]">Mockingbird</p>
+            <p className="w-[150px] text-[12px] md:text-[15px] font-semibold">
+              Mockingbird
+            </p>
             <p className="w-[100px] text-[12px] md:text-[15px] text-[#8a8a8a] hover:underline hover:text-white cursor-pointer">
               Eminem
             </p>
