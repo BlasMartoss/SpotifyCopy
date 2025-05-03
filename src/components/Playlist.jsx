@@ -80,8 +80,8 @@ function Playlist({ playlist, onClose }) {
             </h1>
             <p className="text-[15px] text-white">{playlist.artists}</p>
             <p className="text-[15px] font-semibold text-white">
-              {playlist.likes} - {playlist.numeroCanciones} songs, un total de{" "}
-              {playlist.time}
+              {playlist.likes} - {playlist.numeroCanciones} canciones, un total
+              de {playlist.time}
             </p>
           </div>
         </div>
@@ -106,9 +106,9 @@ function Playlist({ playlist, onClose }) {
             <li className="grid grid-cols-12 py-2 border-b border-white mb-5">
               <div className="col-span-1 text-white">#</div>
               <div className="col-span-6 text-sm font-semibold text-white">
-                Title
+                Título
               </div>
-              <div className="col-span-3 text-xs text-gray-300">Album</div>
+              <div className="col-span-3 text-xs text-gray-300">Álbum</div>
               <div className="col-span-2 text-xs text-white flex items-center justify-end pr-2">
                 <FiClock className="inline-block mr-1 text-2xl" />
               </div>
@@ -128,18 +128,24 @@ function Playlist({ playlist, onClose }) {
               >
                 <div className="col-span-1 text-white">{index + 1}</div>
                 <div className="col-span-6 flex items-center">
-                  <div className="w-12 h-12 bg-gray-300 mr-2">
-                    <img src={song.image} alt="" />
+                  <div className=" bg-gray-300 mr-2">
+                    <img
+                      src={song.image}
+                      alt=""
+                      className="w-8 h-8 md:w-12 md:h-12"
+                    />
                   </div>
 
                   <div>
-                    <p className="text-sm font-semibold text-white cursor-pointer">
+                    <p className="text-[10px] md:text-[15px] font-semibold text-white cursor-pointer">
                       {song.title}
                     </p>
-                    <p className="text-xs text-gray-300">{song.author}</p>
+                    <p className="text-[10px] md:text-[15px] text-gray-300">
+                      {song.author}
+                    </p>
                   </div>
                 </div>
-                <div className="col-span-3 text-xs text-gray-300">
+                <div className="col-span-3 text-[10px] md:text-[15px] text-gray-300">
                   {song.album}
                 </div>
                 <div className="col-span-2 text-xs text-white text-right pr-3">
